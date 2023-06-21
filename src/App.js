@@ -16,30 +16,56 @@ function App() {
 
   const calculateMedians = () => {
     const columnCount = Object.keys(rows[0]).length;
+    const columnPairs = getUniqueColumnPairs();
+
     const columnMedians = {};
 
-    for (let i = 0; i < columnCount; i++) {
-      const columnValues = rows
-      .map((row) => row[Object.keys(row)[i]])
-      .filter((value) => value !== '');
+    columnPairs.forEach(([columnNameA, columnNameB]) => {
+      const columnValuesA = rows
+        .map((row) => row[columnNameA])
+        .filter((value) => value !== '')
+        .map(Number);
 
-      if (columnValues.length === 0) {
-        columnMedians[Object.keys(rows[0])[i]] = '';
-        continue;
+      const columnValuesB = rows
+        .map((row) => row[columnNameB])
+        .filter((value) => value !== '')
+        .map(Number);
+
+      if (columnValuesA.length !== columnValuesB.length) {
+        columnMedians[`${columnNameA}-${columnNameB}`] = '';
+        return;
       }
 
-      columnValues.sort((a, b) => Number(a) - Number(b));
+      const columnDifferences = [];
+      for (let j = 0; j < columnValuesA.length; j++) {
+        columnDifferences.push(Math.abs(columnValuesA[j] - columnValuesB[j]));
+      }
 
-      const medianIndex = Math.floor(columnValues.length / 2);
+      columnDifferences.sort((a, b) => a - b);
+
+      const medianIndex = Math.floor(columnDifferences.length / 2);
       const medianValue =
-        columnValues.length % 2 === 0
-          ? (Number(columnValues[medianIndex - 1]) + Number(columnValues[medianIndex])) / 2
-          : Number(columnValues[medianIndex]);
+        columnDifferences.length % 2 === 0
+          ? (columnDifferences[medianIndex - 1] + columnDifferences[medianIndex]) / 2
+          : columnDifferences[medianIndex];
 
-      columnMedians[Object.keys(rows[0])[i]] = medianValue;
-    }
+      columnMedians[`${columnNameA}-${columnNameB}`] = medianValue;
+    });
 
     setMedians(columnMedians);
+  };
+
+  const getUniqueColumnPairs = () => {
+    const columnNames = Object.keys(rows[0]);
+    const columnPairs = [];
+
+    for (let i = 0; i < columnNames.length; i++) {
+      for (let j = i + 1; j < columnNames.length; j++) {
+        columnPairs.push([columnNames[i], columnNames[j]]);
+      }
+    }
+
+    return columnPairs;
   };
 
   const handleChange = (value, rowIndex, columnName) => {
@@ -86,17 +112,19 @@ function App() {
         <table style={{ marginLeft: '20px' }}>
           <thead>
             <tr>
-              <th>Column</th>
-              <th>Median</th>
+              <th>Column Pair</th>
+              {Object.entries(medians).map(([columnPair, medianValue]) => (
+                <th key={columnPair}>{columnPair}</th>
+              ))}
             </tr>
           </thead>
           <tbody>
-            {Object.entries(medians).map(([columnName, medianValue]) => (
-              <tr key={columnName}>
-                <td>{columnName}</td>
-                <td>{medianValue}</td>
-              </tr>
-            ))}
+            <tr>
+              <td>M0 Values</td>
+              {Object.entries(medians).map(([columnPair, medianValue]) => (
+                <td key={columnPair}>{medianValue}</td>
+              ))}
+            </tr>
           </tbody>
         </table>
       </div>
