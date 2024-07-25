@@ -15,7 +15,7 @@
 
 .App-header {
   background-color: #282c34;
-  min-height: 100vh;
+  min-height: 8vh;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -24,6 +24,35 @@
   color: white;
 }
 
+
+.App-content {
+  background-color: #585c64;
+  min-height: 80vh;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(10px + 2vmin);
+  color: white;
+}
+
+.table-container {
+  flex: 1;
+}
+
+.svg-container {
+  flex: 1;
+}
+
+@media (max-width: 768px) {
+  .App-content {
+    flex-direction: column;
+  }
+
+  .svg-container {
+    order: 1;
+  }
+}
 .App-link {
   color: #61dafb;
 }
