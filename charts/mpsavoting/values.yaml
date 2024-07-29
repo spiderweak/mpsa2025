@@ -1,0 +1,39 @@
+replicaCount: 1
+
+image:
+  repository: "latest"
+  pullPolicy: Always
+  tag: "latest"
+
+imagePullSecrets:
+  - name: regcred-mpsavoting
+
+registrySecret:
+  create: true
+  name: regcred-mpsavoting
+  registry: "latest"
+  username: "latest"
+  password: ""
+
+service:
+  type: ClusterIP
+  port: 3000
+  targetPort: 3000
+
+ingress:
+  enabled: true
+  className: spiderweak-nginx
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt
+    acme.cert-manager.io/http01-ingress-class: spiderweak-nginx
+  hosts:
+    mpsa: "votes.hosting.spiderweak.fr"
+    paths:
+      - path: /
+        pathType: Prefix
+        service:
+          port: 3000
+  tls:
+    - secretName: mpsavoting-web-cert
+      hosts:
+        - votes.hosting.spiderweak.fr
