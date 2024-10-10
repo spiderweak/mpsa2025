@@ -24,7 +24,7 @@ delivery_image:
     - buildah login --username $CI_REGISTRY_USER --password $CI_REGISTRY_PASSWORD $CI_REGISTRY
     - >
       buildah bud --format docker
-      -f $CI_PROJECT_DIR/src/Dockerfile
+      -f $CI_PROJECT_DIR/Dockerfile
       -t $CI_REGISTRY_IMAGE:$MPSA_RELEASE_VERSION
       -v /var/lib/containers:/var/lib/containers
       $CI_PROJECT_DIR
