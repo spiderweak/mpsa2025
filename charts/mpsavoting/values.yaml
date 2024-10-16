@@ -1,7 +1,7 @@
 replicaCount: 1
 
 image:
-  repository: "latest"
+  repository: ""
   pullPolicy: Always
   tag: "latest"
 
@@ -11,8 +11,8 @@ imagePullSecrets:
 registrySecret:
   create: true
   name: regcred-mpsavoting
-  registry: "latest"
-  username: "latest"
+  registry: ""
+  username: ""
   password: ""
 
 service:

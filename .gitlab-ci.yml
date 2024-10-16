@@ -32,7 +32,7 @@ delivery_image:
   after_script:
     - buildah logout $CI_REGISTRY
 
-deploy_vrising:
+deploy_mpsavoting:
   stage: deploy
   image: devth/helm:v3.8.0
   environment:
