@@ -9,20 +9,20 @@ spec:
   selector:
     matchLabels:
       {{- include "mpsavoting.selectorLabels" . | nindent 6 }}
-    template:
-      metadata:
-        {{- with .Values.podAnnotations }}
-        annotations:
-          {{- toYaml . | nindent 8 }}
-        {{- end }}
-        labels:
-          {{- include "mpsavoting.selectorLabels" . | nindent 8 }}
-      spec:
-        containers:
-          - name: {{ .Chart.Name }}
-            image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
-            imagePullPolicy: {{ .Values.image.pullPolicy }}
-            ports:
-              - name: http
-                containerPort: 3000
-                protocol: TCP
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "mpsavoting.selectorLabels" . | nindent 8 }}
+    spec:
+      containers:
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: 3000
+              protocol: TCP
