@@ -1,67 +1,250 @@
+/* Basic reset for consistency */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
+  font-family: Arial, sans-serif;
+  height: 100%;
+}
+
+/* Container for the whole app */
 .App {
-  text-align: center;
-}
-
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background-color: #f9f9f9;
 }
 
 .App-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
   background-color: #282c34;
-  min-height: 8vh;
+  padding: 20px;
+  color: white;
+}
+
+/* Main content area */
+.App-content {
+  flex: 1;
+  padding: 20px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
-}
-
-
-.App-content {
-  background-color: #585c64;
-  min-height: 80vh;
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
+  justify-content: flex-start;
 }
 
 .table-container {
-  flex: 1;
+  width: 100%;
+  max-width: 800px;
+  margin-bottom: 20px;
 }
 
+.input-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.input-table th,
+.input-table td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: center;
+}
+
+.input-table th {
+  background-color: #f2f2f2;
+}
+
+button {
+  margin: 5px;
+  padding: 8px 12px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+/* Description column styling */
+.description-cell {
+  font-weight: bold;
+  background-color: #f0f0f0;
+  padding: 8px;
+  text-align: center;
+  width: 120px; /* Set a fixed width for consistency */
+}
+
+.input-table th,
+.input-table td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: center;  /* Center-aligns text and content horizontally */
+  vertical-align: middle;  /* Center-aligns text and content vertically */
+}
+
+.input-table th {
+  background-color: #f2f2f2;
+}
+
+/* Centering content in cells */
+.centered-cell {
+  align-items: center;
+  justify-content: center;
+  vertical-align: middle;
+}
+
+/* Centering content in cells */
+.input-table .no-border-cell {
+  background: none;
+  border: none;
+  align-content: center;
+}
+
+/* Delete button styling */
+.delete-button {
+  font-size: 1rem; /* Scales with font size */
+  font-weight: bold;
+  width: 1.5em; /* Relative sizing */
+  height: 1.5em;
+  background: transparent;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.1s, box-shadow 0.2s;
+
+  color: red;
+  border: 1px solid red;
+  border-radius: 50%; /* Circle shape */
+}
+
+.delete-button:hover {
+  background-color: rgba(255, 0, 0, 0.1);
+}
+
+.delete-button:active {
+  transform: scale(0.95); /* Slightly smaller on click */
+  box-shadow: 0 0 5px rgba(255, 0, 0, 0.5); /* Red shadow on click */
+}
+
+/* Add button styling */
+.add-button {
+  font-size: 1rem;
+  font-weight: bold;
+  width: 1.5em; /* Relative sizing */
+  height: 1.5em;
+  background: transparent;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.1s, box-shadow 0.2s;
+
+  color: green;
+  border: 1px solid green;
+  border-radius: 50%; /* Circle shape to match delete button */
+}
+
+.add-button:hover {
+  background-color: rgba(0, 128, 0, 0.1);
+}
+
+.add-button:active {
+  transform: scale(0.95);
+  box-shadow: 0 0 5px rgba(0, 128, 0, 0.5); /* Green shadow on click */
+}
+
+/* Wrapper for buttons to ensure proper alignment */
+.button-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+}
+
+/* Table section styling */
+.table-section {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Container for Import and Export buttons */
+.table-controls {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-bottom: 8px; /* Adds space between buttons and table */
+}
+
+.text-success {
+  color: green;
+}
+
+.text-danger {
+  color: red;
+}
+
+.text-muted {
+  color: gray;
+}
+
+
+/* Container for ResultsTable and CondorcetGraph */
+.results-graph-container {
+  display: flex;
+  align-items: flex-start; /* Align items to the top */
+  gap: 20px; /* Space between the table and the graph */
+  margin-top: 20px; /* Optional margin for spacing */
+}
+
+/* Optional: Set specific widths */
+.results-graph-container .table-container {
+  flex: 1;
+  max-width: 90%; /* Adjust based on preference */
+}
+
+.results-graph-container svg {
+  flex-shrink: 0;
+  width: 900px; /* Width for the graph area */
+  height: 900px;
+  border: 1px solid black;
+}
+
+/* Container for SVG to make it responsive */
 .svg-container {
-  flex: 1;
+  width: 100%;
+  height: 100%;
+  min-height: 300px;
+  max-height: 600px;
+  min-width: 300;
+  max-width: 600;
 }
 
-@media (max-width: 768px) {
-  .App-content {
-    flex-direction: column;
-  }
-
+/* Larger height for bigger screens */
+@media (min-width: 768px) {
   .svg-container {
-    order: 1;
+    height: 400px;
+    width: 400px;
   }
-}
-.App-link {
-  color: #61dafb;
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
+@media (min-width: 1024px) {
+  .svg-container {
+    height: 500px;
+    width: 500px;
   }
-  to {
-    transform: rotate(360deg);
-  }
+}
+
+.export-buttons {
+  margin-top: 20px;
+  display: flex;
+  gap: 10px;
+}
+
+.export-buttons .btn {
+  padding: 8px 16px;
+  font-size: 14px;
+  cursor: pointer;
 }
