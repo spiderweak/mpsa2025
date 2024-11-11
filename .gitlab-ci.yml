@@ -12,7 +12,7 @@ workflow:
 
 variables:
   MPSA_APP_VERSION: "0.0.1"
-  KUBE_NAMESPACE: bernard-services
+  KUBE_NAMESPACE: "bernard-services"
   BUILDAH_VERSION: "latest"
 
 delivery_image:
