@@ -30,8 +30,6 @@ delivery_image:
   after_script:
     - buildah logout $CI_REGISTRY
 
-
-
 deploy_mpsavoting:
   stage: deploy
   image: devth/helm:v3.8.0
@@ -54,4 +52,4 @@ deploy_mpsavoting:
       --set gitlab.app=${CI_PROJECT_PATH_SLUG}
       mpsavoting
       ./charts/mpsavoting
-      --timeout 25m
+      --timeout 15m
