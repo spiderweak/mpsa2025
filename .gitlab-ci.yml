@@ -38,14 +38,6 @@ deploy_mpsavoting:
   environment:
     name: production
   script:
-    - echo "namespace $KUBE_NAMESPACE"
-    - echo "image.repository=$CI_REGISTRY_IMAGE"
-    - echo "image.tag=$MPSA_APP_VERSION"
-    - echo "registrySecret.registry=$CI_REGISTRY"
-    - echo "registrySecret.username=$CI_DEPLOY_USER"
-    - echo "registrySecret.password=$CI_DEPLOY_PASSWORD"
-    - echo "gitlab.env=${CI_ENVIRONMENT_SLUG}"
-    - echo "gitlab.app=${CI_PROJECT_PATH_SLUG}"
     - >
       helm upgrade
       --install
@@ -62,4 +54,4 @@ deploy_mpsavoting:
       --set gitlab.app=${CI_PROJECT_PATH_SLUG}
       mpsavoting
       ./charts/mpsavoting
-      --timeout 5m
+      --timeout 25m
