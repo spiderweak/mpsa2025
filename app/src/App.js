@@ -9,8 +9,12 @@ import { calculateMedians } from './algorithms/medianCalculation';
 import './App.css';
 
 function App() {
-  const [rows, setRows] = useState([{ A: '', B: '', C: '' }]);
-  const [columns, setColumns] = useState(['A', 'B', 'C']);
+  const [rows, setRows] = useState([{ Coefficient: 1, A: '', B: '', C: '' }]);
+  const [columns, setColumns] = useState([
+    { id: 'col-1', name: 'A' },
+    { id: 'col-2', name: 'B' },
+    { id: 'col-3', name: 'C' },
+  ]);
   const [medians, setMedians] = useState({});
   const [pairwiseScores, setPairwiseScores] = useState({});
   const [cycle, setCycle] = useState([]);
@@ -40,21 +44,53 @@ function App() {
     URL.revokeObjectURL(downloadLink.href);
   };
 
-  const handleChange = (value, rowIndex, columnName) => {
+  const handleChange = (value, rowIndex, columnId) => {
     setRows(prevRows => {
       const updatedRows = [...prevRows];
-      updatedRows[rowIndex][columnName] = value;
+      updatedRows[rowIndex][columnId] = value;
+      return updatedRows;
+    });
+  };
+  
+
+  const handleImport = (importedRows) => {
+    // Exclude the "Coefficient" column from dynamically created columns
+    const newColumns = Object.keys(importedRows[0])
+      .filter((col) => col !== "Coefficient")
+      .map((col, index) => ({
+        id: `col-${index + 1}`,
+        name: col,
+      }));
+  
+    // Format rows to separate "Coefficient" and dynamic columns
+    const formattedRows = importedRows.map((row) => {
+      const newRow = {
+        Coefficient: parseFloat(row.Coefficient) || 1, // Explicitly handle "Coefficient"
+      };
+      newColumns.forEach(({ id, name }) => {
+        newRow[id] = row[name] || '';
+      });
+      return newRow;
+    });
+  
+    // Update the state with new columns and rows
+    setColumns(newColumns); // Exclude "Coefficient"
+    setRows(formattedRows); // Include "Coefficient" as a fixed property
+  };
+  
+  
+  const handleColumnsChange = (newColumns) => {
+    setColumns(newColumns);
+  };
+
+  const handleCoefficientChange = (value, rowIndex) => {
+    setRows(prevRows => {
+      const updatedRows = [...prevRows];
+      updatedRows[rowIndex].Coefficient = parseFloat(value) || 1;
       return updatedRows;
     });
   };
 
-  const handleImport = (importedRows) => {
-    setRows(importedRows);
-  };
-
-  const handleColumnsChange = (newColumns) => {
-    setColumns(newColumns);
-  };
 
   const addRow = () => {
     const newRow = columns.reduce((acc, col) => ({ ...acc, [col]: '' }), {});
@@ -62,13 +98,34 @@ function App() {
   };
 
   const addColumn = () => {
-    const newColumnName = `Column${columns.length + 1}`;
-    setColumns([...columns, newColumnName]);
+    const newColumn = {
+      id: `col-${Date.now()}`,
+      name: `Column${columns.length + 1}`,
+    };
+    setColumns([...columns, newColumn]);
     setRows(prevRows =>
-      prevRows.map(row => ({ ...row, [newColumnName]: '' }))
+      prevRows.map(row => ({ ...row, [newColumn.id]: '' }))
     );
   };
 
+  const handleColumnNameChange = (newName, index) => {
+    const columnId = columns[index].id;
+  
+    setColumns(prevColumns => {
+      const updatedColumns = [...prevColumns];
+      updatedColumns[index] = { ...updatedColumns[index], name: newName }; // Update name, keep ID
+      return updatedColumns;
+    });
+  
+    setRows(prevRows =>
+      prevRows.map(row => ({
+        ...row,
+        [columnId]: row[columnId], // Maintain data mapping to column ID
+      }))
+    );
+  };
+  
+  /*
   const handleColumnNameChange = (newName, index) => {
     const oldName = columns[index];
     const updatedColumns = [...columns];
@@ -83,31 +140,41 @@ function App() {
       })
     );
   };
+  */
 
   const handleDeleteRow = (rowIndex) => {
     setRows(prevRows => prevRows.filter((_, index) => index !== rowIndex));
   };
 
   const handleDeleteColumn = (columnIndex) => {
-    const columnName = columns[columnIndex];
+    const columnId = columns[columnIndex].id;
     setColumns(prevColumns => prevColumns.filter((_, index) => index !== columnIndex));
     setRows(prevRows =>
       prevRows.map(row => {
         const updatedRow = { ...row };
-        delete updatedRow[columnName];
+        delete updatedRow[columnId];
         return updatedRow;
       })
     );
   };
 
   const onExport = () => {
-    const csv = Papa.unparse(rows, { columns });
+    const csvRows = rows.map(row => {
+      const formattedRow = {};
+      columns.forEach(({ id, name }) => {
+        formattedRow[name] = row[id];
+      });
+      return formattedRow;
+    });
+    const csv = Papa.unparse(csvRows, { columns: columns.map(col => col.name) });
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
     const link = document.createElement('a');
     link.href = URL.createObjectURL(blob);
     link.download = 'table_data.csv';
     link.click();
   };
+  
+
 
   useEffect(() => {
     const newPairwiseScores = calculatePairwiseMedians(rows, columns);
@@ -139,13 +206,14 @@ function App() {
             onAddRow={addRow}
             onAddColumn={addColumn}
             onExport={onExport}
+            onCoefficientChange={handleCoefficientChange}
           />
         </div>
 
         {/* Flex container for ResultsTable and CondorcetGraph */}
         <div className="results-graph-container">
           <div>
-            <ResultsTable pairwiseScores={pairwiseScores} />
+            <ResultsTable columns={columns} pairwiseScores={pairwiseScores} />
             <div className="export-buttons">
               <button onClick={exportSVGAsImage} className="btn btn-primary">Export Graph as PNG</button>
               <button onClick={exportResultsTableAsCSV} className="btn btn-secondary">Export Results as CSV</button>
@@ -155,7 +223,6 @@ function App() {
         </div>
 
         {/* Export Buttons */}
-        
       </div>
     </div>
   );

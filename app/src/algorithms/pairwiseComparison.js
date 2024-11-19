@@ -3,23 +3,28 @@
 export function calculatePairwiseMedians(rows, columns) {
   const pairwiseScores = {};
 
+  // Filter out the "Coefficient" column
+  const filteredColumns = columns.filter(column => column.name !== 'Coefficient');
+
   // Initialize pairwiseScores object
-  columns.forEach(candidateA => {
-    pairwiseScores[candidateA] = {};
-    columns.forEach(candidateB => {
-      if (candidateA !== candidateB) {
-        pairwiseScores[candidateA][candidateB] = [];
+  filteredColumns.forEach(candidateA => {
+    pairwiseScores[candidateA.id] = {};
+    filteredColumns.forEach(candidateB => {
+      if (candidateA.id !== candidateB.id) {
+        pairwiseScores[candidateA.id][candidateB.id] = [];
       }
     });
   });
 
-  // Calculate pairwise differences and collect values for each pair
+  // Calculate pairwise differences and replicate by coefficient
   rows.forEach(row => {
-    columns.forEach(candidateA => {
-      columns.forEach(candidateB => {
-        if (candidateA !== candidateB) {
-          const diff = row[candidateA] - row[candidateB];
-          pairwiseScores[candidateA][candidateB].push(diff);
+    const coefficient = parseInt(row.Coefficient, 10) || 1; // Number of bulletins
+    filteredColumns.forEach(candidateA => {
+      filteredColumns.forEach(candidateB => {
+        if (candidateA.id !== candidateB.id) {
+          const diff = row[candidateA.id] - row[candidateB.id];
+          const weightedDiffs = Array(coefficient).fill(diff); // Replicate difference by coefficient
+          pairwiseScores[candidateA.id][candidateB.id].push(...weightedDiffs);
         }
       });
     });

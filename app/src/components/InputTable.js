@@ -1,11 +1,11 @@
 import React from 'react';
 import Papa from 'papaparse';
 
-function InputTable({ rows, columns, onChange, onImport, onColumnsChange, onColumnNameChange, onDeleteRow, onDeleteColumn, onAddRow, onAddColumn, onExport }) {
+function InputTable({ rows, columns, onChange, onImport, onColumnsChange, onColumnNameChange, onDeleteRow, onDeleteColumn, onAddRow, onAddColumn, onExport, onCoefficientChange }) {
 
-  const handleCellChange = (e, rowIndex, columnName) => {
+  const handleCellChange = (e, rowIndex, columnId) => {
     const value = e.target.value;
-    onChange(value, rowIndex, columnName);
+    onChange(value, rowIndex, columnId);
   };
 
   const handleFileUpload = (e) => {
@@ -14,30 +14,43 @@ function InputTable({ rows, columns, onChange, onImport, onColumnsChange, onColu
       Papa.parse(file, {
         header: true,
         complete: (result) => {
-          const csvColumns = Object.keys(result.data[0]).filter(col => col);
-          const data = result.data.map(row => {
-            const newRow = {};
-            csvColumns.forEach(column => {
-              newRow[column] = row[column] || '';
-            });
-            return newRow;
-          });
+          // Extract column names from the CSV, excluding "Coefficient"
+          const csvColumns = Object.keys(result.data[0]).filter(col => col !== 'Coefficient');
           
+          // Ensure "Coefficient" values are updated or defaulted
+          const data = result.data.map(row => ({
+            ...row,
+            Coefficient: parseFloat(row.Coefficient) || 1,
+          }));
+  
+          // Update the columns, excluding "Coefficient" as it is handled separately
           onColumnsChange(csvColumns);
+  
+          // Pass the parsed data to the import handler
           onImport(data);
         },
         error: (error) => {
           console.error("Error parsing CSV file:", error);
-        }
+        },
       });
     }
   };
+  
 
   const handleHeaderChange = (e, index) => {
     const newColumnName = e.target.value;
     onColumnNameChange(newColumnName, index);
   };
-  
+
+  const handleCoefficientChange = (e, rowIndex) => {
+    const value = parseFloat(e.target.value) || 0; // Ensure it's a valid number
+    if (value < 0) {
+      console.log("Coefficient cannot be negative."); // Optional user feedback
+      onCoefficientChange(1, rowIndex);
+    }
+    onCoefficientChange(value, rowIndex);
+  };
+
   return (
     <div className="table-section">
       {/* Container for Import and Export buttons */}
@@ -56,11 +69,12 @@ function InputTable({ rows, columns, onChange, onImport, onColumnsChange, onColu
           <thead>
             <tr>
               <th>Candidate</th>
+              <th>Coefficient</th>
               {columns.map((column, index) => (
                 <th key={index}>
                   <input
                     type="text"
-                    value={column}
+                    value={column.name}
                     onChange={(e) => handleHeaderChange(e, index)}
                     className="form-control"
                   />
@@ -77,12 +91,21 @@ function InputTable({ rows, columns, onChange, onImport, onColumnsChange, onColu
                 <td className="description-cell">
                   {`Vote #${rowIndex + 1}`}
                 </td>
+                <td>
+                  <input
+                    type="number"
+                    min="1"
+                    value={row.Coefficient ?? 1}
+                    onChange={(e) => handleCoefficientChange(e, rowIndex)}
+                    className="form-control"
+                  />
+                </td>
                 {columns.map((column) => (
-                  <td key={column}>
+                  <td key={column.id}>
                     <input
                       type="text"
-                      value={row[column] || ''}
-                      onChange={(e) => handleCellChange(e, rowIndex, column)}
+                      value={row[column.id] || ''}
+                      onChange={(e) => handleCellChange(e, rowIndex, column.id)}
                       className="form-control"
                     />
                   </td>
@@ -96,6 +119,7 @@ function InputTable({ rows, columns, onChange, onImport, onColumnsChange, onColu
               <td className="centered-cell no-border-cell">
                 <button className="add-button" onClick={onAddRow}>+</button>
               </td>
+              <td></td>
               {columns.map((_, index) => (
                 <td key={index} className="centered-cell no-border-cell">
                   <button className="delete-button" onClick={() => onDeleteColumn(index)}>-</button>
