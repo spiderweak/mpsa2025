@@ -75,6 +75,7 @@ const CondorcetGraph = forwardRef(({ medians, columns }, ref) => {
       };
     });
 
+
     svg.append('defs')
       .append('marker')
       .attr('id', 'arrowhead')
@@ -86,7 +87,7 @@ const CondorcetGraph = forwardRef(({ medians, columns }, ref) => {
       .attr('orient', 'auto')
       .append('path')
       .attr('d', 'M 0 0 L 10 5 L 0 10 Z')
-      .attr('fill', 'gray');
+      .attr('fill', 'green');
 
     const maxDifference = Math.max(
       ...Object.values(medians).map(val => Math.abs(val))
@@ -115,20 +116,25 @@ const CondorcetGraph = forwardRef(({ medians, columns }, ref) => {
             const absValue = Math.abs(medianValue);
             const strokeWidth = thicknessScale(absValue);
             let color = 'green';
-            if (medianValue > 0) {
+            if (medianValue < 0) {
               [x1, y1, x2, y2] = [x2, y2, x1, y1];
-            } else if (medianValue === 0) {
-              color = 'gray';
-            }
-
-            svg.append('line')
+              svg.append('line')
               .attr('x1', x1)
               .attr('y1', y1)
               .attr('x2', x2)
               .attr('y2', y2)
-              .attr('stroke', color)
+              .attr('stroke', "green")
               .attr('stroke-width', strokeWidth)
               .attr('marker-end', 'url(#arrowhead)');
+            } else if (medianValue === 0) {
+              svg.append('line')
+              .attr('x1', x1)
+              .attr('y1', y1)
+              .attr('x2', x2)
+              .attr('y2', y2)
+              .attr('stroke', "gray")
+              .attr('stroke-width', strokeWidth)
+            }
 
             const textX = x1 + 0.25 * (x2 - x1);
             const textY = y1 + 0.25 * (y2 - y1);
