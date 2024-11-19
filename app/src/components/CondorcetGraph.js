@@ -118,22 +118,20 @@ const CondorcetGraph = forwardRef(({ medians, columns }, ref) => {
             let color = 'green';
             if (medianValue < 0) {
               [x1, y1, x2, y2] = [x2, y2, x1, y1];
-              svg.append('line')
-              .attr('x1', x1)
-              .attr('y1', y1)
-              .attr('x2', x2)
-              .attr('y2', y2)
-              .attr('stroke', "green")
-              .attr('stroke-width', strokeWidth)
-              .attr('marker-end', 'url(#arrowhead)');
             } else if (medianValue === 0) {
-              svg.append('line')
+              color = 'gray';
+            }
+
+            svg.append('line')
               .attr('x1', x1)
               .attr('y1', y1)
               .attr('x2', x2)
               .attr('y2', y2)
-              .attr('stroke', "gray")
+              .attr('stroke', color)
               .attr('stroke-width', strokeWidth)
+
+            if (medianValue != 0) {
+              svg.attr('marker-end', 'url(#arrowhead)');
             }
 
             const textX = x1 + 0.25 * (x2 - x1);
