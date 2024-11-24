@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, forwardRef, useImperativeHandle } from 'react';
 import * as d3 from 'd3';
 
-const CondorcetGraph = forwardRef(({ medians, columns }, ref) => {
+const CondorcetGraph = forwardRef(({ pairwiseScores, columns }, ref) => {
   const svgRef = useRef();
 
   useImperativeHandle(ref, () => ({
@@ -57,7 +57,7 @@ const CondorcetGraph = forwardRef(({ medians, columns }, ref) => {
     const nodePositions = columns
       .filter(column => column.name !== 'Coefficient') // Exclude Coefficient
       .map((candidate, index) => {
-        const angle = (index * 2 * Math.PI) / (columns.length);
+        const angle = (index * 2 * Math.PI) / (columns.length); // Adjust for non-coefficient nodes
         return {
           id: candidate.id,
           name: candidate.name,
@@ -84,7 +84,7 @@ const CondorcetGraph = forwardRef(({ medians, columns }, ref) => {
 
     // Scaling for edge thickness
     const maxDifference = Math.max(
-      ...Object.values(medians).map(val => Math.abs(val))
+      ...Object.values(pairwiseScores).flatMap(scores => Object.values(scores).map(Math.abs))
     );
     const thicknessScale = d3.scaleLinear()
       .domain([0, maxDifference])
@@ -94,8 +94,8 @@ const CondorcetGraph = forwardRef(({ medians, columns }, ref) => {
     nodePositions.forEach(source => {
       nodePositions.forEach(target => {
         if (source.id !== target.id) {
-          const medianValue = medians[`${source.id}-${target.id}`];
-          if (medianValue !== undefined) {
+          const medianValue = pairwiseScores[source.id]?.[target.id];
+          if (medianValue !== undefined && medianValue >= 0){
             const dx = target.x - source.x;
             const dy = target.y - source.y;
             const angle = Math.atan2(dy, dx);
@@ -108,20 +108,14 @@ const CondorcetGraph = forwardRef(({ medians, columns }, ref) => {
 
             const absValue = Math.abs(medianValue);
             const strokeWidth = thicknessScale(absValue);
-            let color = 'green';
-            if (medianValue < 0) {
-              [x1, y1, x2, y2] = [x2, y2, x1, y1];
-            } else if (medianValue === 0) {
-              color = 'gray';
-            }
 
             svg.append('line')
               .attr('x1', x1)
               .attr('y1', y1)
               .attr('x2', x2)
               .attr('y2', y2)
-              .attr('stroke', color)
               .attr('stroke-width', strokeWidth)
+              .attr('stroke', medianValue !== 0 ? 'green' : 'gray')
               .attr('marker-end', medianValue !== 0 ? 'url(#arrowhead)' : null);
 
             const textX = x1 + 0.25 * (x2 - x1);
@@ -166,7 +160,7 @@ const CondorcetGraph = forwardRef(({ medians, columns }, ref) => {
       .text(d => d.name) // Use `name` for labels
       .attr('font-size', '24px')
       .attr('fill', 'black');
-  }, [medians, columns]);
+  }, [pairwiseScores, columns]);
 
   return (
     <div className="svg-container">

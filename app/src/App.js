@@ -219,7 +219,7 @@ function App() {
               <button onClick={exportResultsTableAsCSV} className="btn btn-secondary">Export Results as CSV</button>
             </div>
           </div>  
-          <CondorcetGraph ref={graphRef} medians={medians} columns={columns} />
+          <CondorcetGraph ref={graphRef} pairwiseScores={pairwiseScores} columns={columns} />
         </div>
 
         {/* Export Buttons */}
