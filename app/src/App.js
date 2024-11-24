@@ -159,12 +159,13 @@ function App() {
   const onExport = () => {
     const csvRows = rows.map(row => {
       const formattedRow = {};
+      formattedRow["Coefficient"] = row.Coefficient;
       columns.forEach(({ id, name }) => {
         formattedRow[name] = row[id];
       });
       return formattedRow;
     });
-    const csv = Papa.unparse(csvRows, { columns: columns.map(col => col.name) });
+    const csv = Papa.unparse(csvRows, { columns: ["Coefficient", ...columns.map(col => col.name)] });
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
     const link = document.createElement('a');
     link.href = URL.createObjectURL(blob);
