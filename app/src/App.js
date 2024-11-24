@@ -5,7 +5,6 @@ import ResultsTable from './components/ResultsTable';
 import CondorcetGraph from './components/CondorcetGraph';
 import { calculatePairwiseMedians } from './algorithms/pairwiseComparison';
 import { detectCondorcetCycle } from './algorithms/condorcetCycle';
-import { calculateMedians } from './algorithms/medianCalculation';
 import './App.css';
 
 function App() {
@@ -15,7 +14,6 @@ function App() {
     { id: 'col-2', name: 'B' },
     { id: 'col-3', name: 'C' },
   ]);
-  const [medians, setMedians] = useState({});
   const [pairwiseScores, setPairwiseScores] = useState({});
   const [cycle, setCycle] = useState([]);
   
@@ -179,9 +177,6 @@ function App() {
   useEffect(() => {
     const newPairwiseScores = calculatePairwiseMedians(rows, columns);
     setPairwiseScores(newPairwiseScores);
-
-    const newMedians = calculateMedians(rows, columns);
-    setMedians(newMedians);
 
     const detectedCycle = detectCondorcetCycle(newPairwiseScores, columns);
     setCycle(detectedCycle);
