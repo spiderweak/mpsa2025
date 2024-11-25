@@ -27,7 +27,7 @@ ingress:
     cert-manager.io/cluster-issuer: letsencrypt
     acme.cert-manager.io/http01-ingress-class: spiderweak-nginx
   hosts:
-    mpsavoting: "voting.a-bernard.fr"
+    mpsavoting: "voting.testing.a-bernard.fr"
     paths:
       - path: /
         pathType: Prefix
@@ -36,4 +36,4 @@ ingress:
   tls:
     - secretName: mpsavoting-web-cert
       hosts:
-        - voting.a-bernard.fr
+        - voting.testing.a-bernard.fr
