@@ -26,22 +26,32 @@ function ResultsTable({ columns, pairwiseScores }) {
           {Object.entries(pairwiseScores).map(([candidateId, scores]) => (
             <tr key={candidateId}>
               <td>{idToNameMap[candidateId]}</td> {/* Convert id to name */}
-              {filteredColumns.map(column => (
-                <td
-                  key={column.id}
-                  className={`${
-                    candidateId === column.id
-                      ? 'bg-light'
-                      : scores[column.id] > 0
-                      ? 'text-success'
-                      : scores[column.id] < 0
-                      ? 'text-danger'
-                      : 'text-muted'
-                  }`}
-                >
-                  {candidateId === column.id ? '-' : scores[column.id]?.toFixed(2) || '0.00'}
-                </td>
-              ))}
+              {filteredColumns.map(column => {
+                const score = scores[column.id];
+                const displayScore =
+                  candidateId === column.id
+                    ? '-' // Diagonal cell
+                    : isNaN(score)
+                    ? 'Empty' // Replace NaN with "Empty"
+                    : score?.toFixed(2) || '0.00'; // Format score
+
+                return (
+                  <td
+                    key={column.id}
+                    className={`${
+                      candidateId === column.id
+                        ? 'bg-light'
+                        : score > 0
+                        ? 'text-success'
+                        : score < 0
+                        ? 'text-danger'
+                        : 'text-muted'
+                    }`}
+                  >
+                    {displayScore}
+                  </td>
+                );
+              })}
             </tr>
           ))}
         </tbody>

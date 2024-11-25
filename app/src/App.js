@@ -91,7 +91,10 @@ function App() {
 
 
   const addRow = () => {
-    const newRow = columns.reduce((acc, col) => ({ ...acc, [col]: '' }), {});
+    const newRow = {
+      Coefficient: 1,
+      ...columns.reduce((acc, col) => ({ ...acc, [col.id]: '' }), {}),
+    };
     setRows([...rows, newRow]);
   };
 
