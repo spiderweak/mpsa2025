@@ -22,9 +22,20 @@ export function calculatePairwiseMedians(rows, columns) {
     filteredColumns.forEach(candidateA => {
       filteredColumns.forEach(candidateB => {
         if (candidateA.id !== candidateB.id) {
-          const diff = row[candidateA.id] - row[candidateB.id];
-          const weightedDiffs = Array(coefficient).fill(diff); // Replicate difference by coefficient
-          pairwiseScores[candidateA.id][candidateB.id].push(...weightedDiffs);
+          const valueA = row[candidateA.id];
+          const valueB = row[candidateB.id];
+          if (
+            valueA !== undefined &&
+            valueB !== undefined &&
+            valueA !== '' &&
+            valueB !== ''
+          ) {
+            const diff = valueA - valueB;
+            if (!isNaN(diff)) {
+              const weightedDiffs = Array(coefficient).fill(diff); // Replicate difference by coefficient
+              pairwiseScores[candidateA.id][candidateB.id].push(...weightedDiffs);
+            }
+          }
         }
       });
     });
