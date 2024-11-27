@@ -1,6 +1,6 @@
 {
-  "short_name": "React App",
-  "name": "Create React App Sample",
+  "short_name": "Election Results Exploration Tool",
+  "name": "A tool to explore some mitigation strategies to adress voting issues behind Arrow's impossibility theorem",
   "icons": [
     {
       "src": "favicon.ico",
