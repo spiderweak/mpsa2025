@@ -248,3 +248,14 @@ button {
   font-size: 14px;
   cursor: pointer;
 }
+
+.warning-message {
+  background-color: #ffe6e6;
+  color: #ff0000;
+  border: 1px solid #ff0000;
+  padding: 10px;
+  margin: 10px 0;
+  border-radius: 5px;
+  text-align: center;
+  font-weight: bold;
+}

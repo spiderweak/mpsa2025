@@ -49,7 +49,7 @@ function App() {
       return updatedRows;
     });
   };
-  
+
 
   const handleImport = (importedRows) => {
     // Exclude the "Coefficient" column from dynamically created columns
@@ -59,7 +59,7 @@ function App() {
         id: `col-${index + 1}`,
         name: col,
       }));
-  
+
     // Format rows to separate "Coefficient" and dynamic columns
     const formattedRows = importedRows.map((row) => {
       const newRow = {
@@ -175,7 +175,8 @@ function App() {
     link.download = 'table_data.csv';
     link.click();
   };
-  
+
+  const [warningMessage, setWarningMessage] = useState('');
 
 
   useEffect(() => {
@@ -184,6 +185,17 @@ function App() {
 
     const detectedCycle = detectCondorcetCycle(newPairwiseScores, columns);
     setCycle(detectedCycle);
+
+    const hasZeroScore = Object.values(newPairwiseScores).some(candidateScores =>
+      Object.values(candidateScores).some(score => score === 0)
+    );
+
+    if (detectedCycle.length > 0 || hasZeroScore) {
+      setWarningMessage('A cycle has been detected in candidate evaluation with a pairwise score of zero.');
+    } else {
+      setWarningMessage('');
+    }
+
   }, [rows, columns]);
 
   return (
@@ -191,6 +203,13 @@ function App() {
       <header className="App-header">
         <h1> Why break condorcet cycle when we can make them disappear ? </h1>
       </header>
+
+      {warningMessage && (
+        <div className="warning-message">
+          <p>{warningMessage}</p>
+        </div>
+      )}
+
       <div className="App-content">
         <div className="table-container">
           <InputTable
