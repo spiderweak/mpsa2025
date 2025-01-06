@@ -4,7 +4,7 @@ import InputTable from './components/InputTable';
 import ResultsTable from './components/ResultsTable';
 import CondorcetGraph from './components/CondorcetGraph';
 import { calculatePairwiseMedians } from './algorithms/pairwiseComparison';
-import { detectCondorcetCycle } from './algorithms/condorcetCycle';
+import { detectCondorcetCycles } from './algorithms/condorcetCycle';
 import './App.css';
 
 function App() {
@@ -16,7 +16,7 @@ function App() {
   ]);
   const [pairwiseScores, setPairwiseScores] = useState({});
   const [cycle, setCycle] = useState([]);
-  
+
   const graphRef = useRef();
 
   const exportSVGAsImage = () => {
@@ -182,19 +182,33 @@ function App() {
   useEffect(() => {
     const newPairwiseScores = calculatePairwiseMedians(rows, columns);
     setPairwiseScores(newPairwiseScores);
+    console.log("Pairwise Scores:", newPairwiseScores);
 
-    const detectedCycle = detectCondorcetCycle(newPairwiseScores, columns);
-    setCycle(detectedCycle);
+
+    const detectedCycles = detectCondorcetCycles(newPairwiseScores, columns);
+    setCycle(detectedCycles);
 
     const hasZeroScore = Object.values(newPairwiseScores).some(candidateScores =>
       Object.values(candidateScores).some(score => score === 0)
     );
 
-    if (detectedCycle.length > 0 || hasZeroScore) {
-      setWarningMessage('A cycle has been detected in candidate evaluation with a pairwise score of zero.');
+    if (detectedCycles.length > 0 || hasZeroScore) {
+      if (detectedCycles.length > 0) {
+        console.log("Detected Cycles:", detectedCycles);
+        setWarningMessage(
+          `Condorcet cycles detected: ${detectedCycles
+            .map(cycle => cycle.join(' > '))
+            .join(' | ')}`
+        );
+      } else {
+        console.log("Detected Cycles:", detectedCycles);
+        setWarningMessage('A cycle has been detected in candidate evaluation with a pairwise score of zero.');
+      }
     } else {
+      console.log("Detected Cycles:", detectedCycles);
       setWarningMessage('');
     }
+
 
   }, [rows, columns]);
 
