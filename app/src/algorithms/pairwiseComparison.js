@@ -1,6 +1,7 @@
 // src/algorithms/pairwiseComparison.js
 
-export function calculatePairwiseMedians(rows, columns) {
+export function calculatePairwiseMedians(rows, columns, rankPair) {
+  const [rankOdd, rankEven] = rankPair; // Destructure the rank pair
   const pairwiseScores = {};
 
   // Filter out the "Coefficient" column
@@ -41,17 +42,36 @@ export function calculatePairwiseMedians(rows, columns) {
     });
   });
 
-  // Compute medians for each pair
-  Object.keys(pairwiseScores).forEach(candidateA => {
-    Object.keys(pairwiseScores[candidateA]).forEach(candidateB => {
-      const diffs = pairwiseScores[candidateA][candidateB].sort((a, b) => a - b);
-      const medianIndex = Math.floor(diffs.length / 2);
-      pairwiseScores[candidateA][candidateB] =
-        diffs.length % 2 === 0
-          ? (diffs[medianIndex - 1] + diffs[medianIndex]) / 2
-          : diffs[medianIndex];
-    });
+  // Compute averages for each pair based on slice around the middle
+Object.keys(pairwiseScores).forEach(candidateA => {
+  Object.keys(pairwiseScores[candidateA]).forEach(candidateB => {
+    const diffs = pairwiseScores[candidateA][candidateB].sort((a, b) => a - b);
+    const medianIndex = Math.floor(diffs.length / 2);
+    
+    let sliceStart, sliceEnd;
+
+    if (diffs.length % 2 === 0) {
+      // For even lengths, calculate the slice centered on the middle values
+      sliceStart = medianIndex - 1 - Math.floor(rankEven / 2 - 1);
+      sliceEnd = medianIndex + Math.floor(rankEven / 2  - 1 );
+    } else {
+      // For odd lengths, calculate the slice centered on the middle value
+      sliceStart = medianIndex - Math.floor((rankOdd - 1) / 2);
+      sliceEnd = medianIndex + Math.floor((rankOdd - 1) / 2);
+    }
+
+    // Ensure slice bounds are within array limits
+    sliceStart = Math.max(sliceStart, 0);
+    sliceEnd = Math.min(sliceEnd, diffs.length - 1);
+
+    // Calculate the average of the slice
+    const slice = diffs.slice(sliceStart, sliceEnd + 1);
+    const average = slice.reduce((sum, value) => sum + value, 0) / slice.length;
+
+    pairwiseScores[candidateA][candidateB] = average;
   });
+});
+
 
   return pairwiseScores;
 }

@@ -10,30 +10,30 @@ export function detectCondorcetCycles(pairwiseScores, columns) {
     const startCandidate = currentPath[0];
 
     for (let next of candidates) {
-      console.log(`Checking edge from ${idToName[current]} to ${idToName[next]}`);
+      // console.log(`Checking edge from ${idToName[current]} to ${idToName[next]}`);
 
       // If revisiting the start node and forming a valid cycle
       if (next === startCandidate && currentPath.length > 2) {
         const finalEdgeScore = pairwiseScores[current][startCandidate];
-        console.log(`Final edge from ${idToName[current]} to ${idToName[startCandidate]} has score: ${finalEdgeScore}`);
+        //console.log(`Final edge from ${idToName[current]} to ${idToName[startCandidate]} has score: ${finalEdgeScore}`);
         if (finalEdgeScore > 0) { // Ensure the last edge is valid
-          console.log(`Cycle confirmed: ${[...currentPath, next].map(id => idToName[id]).join(" > ")}`);
+          //console.log(`Cycle confirmed: ${[...currentPath, next].map(id => idToName[id]).join(" > ")}`);
           cycles.push([...currentPath, next]);
         } else {
-          console.log(`Cycle rejected due to invalid final edge`);
+          //console.log(`Cycle rejected due to invalid final edge`);
         }
         continue;
       }
 
       // Skip self-loops and invalid edges
       if (current === next || (visited.has(next) && next !== startCandidate)) {
-        console.log(`Skipping ${idToName[next]} (self-loop or already visited non-start node)`);
+        //console.log(`Skipping ${idToName[next]} (self-loop or already visited non-start node)`);
         continue;
       }
 
       // Check pairwise score
       if (pairwiseScores[current][next] > 0) {
-        console.log(`Valid edge from ${idToName[current]} to ${idToName[next]} with score: ${pairwiseScores[current][next]}`);
+        //console.log(`Valid edge from ${idToName[current]} to ${idToName[next]} with score: ${pairwiseScores[current][next]}`);
         visited.add(next);
         dfs([...currentPath, next], visited);
         visited.delete(next); // Backtrack

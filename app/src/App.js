@@ -16,8 +16,15 @@ function App() {
   ]);
   const [pairwiseScores, setPairwiseScores] = useState({});
   const [cycle, setCycle] = useState([]);
+  const [selectedRankIndex, setSelectedRankIndex] = useState(1); // Default index: 1 -> (m1, m2)
 
   const graphRef = useRef();
+
+  const handleRankChange = (direction) => {
+    setSelectedRankIndex((prevIndex) =>
+      direction === 'increment' ? prevIndex + 1 : Math.max(1, prevIndex - 1)
+    );
+  };
 
   const exportSVGAsImage = () => {
     if (graphRef.current) {
@@ -70,13 +77,12 @@ function App() {
       });
       return newRow;
     });
-  
+
     // Update the state with new columns and rows
     setColumns(newColumns); // Exclude "Coefficient"
     setRows(formattedRows); // Include "Coefficient" as a fixed property
   };
-  
-  
+
   const handleColumnsChange = (newColumns) => {
     setColumns(newColumns);
   };
@@ -180,7 +186,13 @@ function App() {
 
 
   useEffect(() => {
-    const newPairwiseScores = calculatePairwiseMedians(rows, columns);
+    const rankPair = selectedRankIndex % 2 === 1
+    ? [selectedRankIndex, selectedRankIndex + 1] // Odd: [n, n+1]
+    : [selectedRankIndex + 1, selectedRankIndex]; // Even: [n+1, n]
+    console.log("Ranks:", rankPair);
+
+
+    const newPairwiseScores = calculatePairwiseMedians(rows, columns, rankPair);
     setPairwiseScores(newPairwiseScores);
     console.log("Pairwise Scores:", newPairwiseScores);
 
@@ -210,19 +222,13 @@ function App() {
     }
 
 
-  }, [rows, columns]);
+  }, [rows, columns, selectedRankIndex]);
 
   return (
     <div className="App">
       <header className="App-header">
         <h1> Why break condorcet cycle when we can make them disappear ? </h1>
       </header>
-
-      {warningMessage && (
-        <div className="warning-message">
-          <p>{warningMessage}</p>
-        </div>
-      )}
 
       <div className="App-content">
         <div className="table-container">
@@ -242,15 +248,30 @@ function App() {
           />
         </div>
 
+      <div className="rank-selection">
+        <button onClick={() => handleRankChange('decrement')}>&lt;</button>
+        <span>Rank ({`m${selectedRankIndex},m${selectedRankIndex + 1}`})</span>
+        <button onClick={() => handleRankChange('increment')}>&gt;</button>
+      </div>
+
+      {warningMessage && (
+        <div className="warning-message">
+          <p>{warningMessage}</p>
+        </div>
+      )}
+
         {/* Flex container for ResultsTable and CondorcetGraph */}
         <div className="results-graph-container">
           <div>
-            <ResultsTable columns={columns} pairwiseScores={pairwiseScores} />
+            <ResultsTable
+              columns={columns}
+              pairwiseScores={pairwiseScores}
+            />
             <div className="export-buttons">
               <button onClick={exportSVGAsImage} className="btn btn-primary">Export Graph as PNG</button>
               <button onClick={exportResultsTableAsCSV} className="btn btn-secondary">Export Results as CSV</button>
             </div>
-          </div>  
+          </div>
           <CondorcetGraph ref={graphRef} pairwiseScores={pairwiseScores} columns={columns} />
         </div>
 
