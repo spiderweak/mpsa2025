@@ -189,12 +189,12 @@ function App() {
     const rankPair = selectedRankIndex % 2 === 1
     ? [selectedRankIndex, selectedRankIndex + 1] // Odd: [n, n+1]
     : [selectedRankIndex + 1, selectedRankIndex]; // Even: [n+1, n]
-    console.log("Ranks:", rankPair);
+    //console.log("Ranks:", rankPair);
 
 
     const newPairwiseScores = calculatePairwiseMedians(rows, columns, rankPair);
     setPairwiseScores(newPairwiseScores);
-    console.log("Pairwise Scores:", newPairwiseScores);
+    //console.log("Pairwise Scores:", newPairwiseScores);
 
 
     const detectedCycles = detectCondorcetCycles(newPairwiseScores, columns);
@@ -206,18 +206,18 @@ function App() {
 
     if (detectedCycles.length > 0 || hasZeroScore) {
       if (detectedCycles.length > 0) {
-        console.log("Detected Cycles:", detectedCycles);
+        //console.log("Detected Cycles:", detectedCycles);
         setWarningMessage(
           `Condorcet cycles detected: ${detectedCycles
             .map(cycle => cycle.join(' > '))
             .join(' | ')}`
         );
       } else {
-        console.log("Detected Cycles:", detectedCycles);
+        //console.log("Detected Cycles:", detectedCycles);
         setWarningMessage('A cycle has been detected in candidate evaluation with a pairwise score of zero.');
       }
     } else {
-      console.log("Detected Cycles:", detectedCycles);
+      //console.log("Detected Cycles:", detectedCycles);
       setWarningMessage('');
     }
 
