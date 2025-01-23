@@ -17,7 +17,12 @@ function App() {
   const [pairwiseScores, setPairwiseScores] = useState({});
   const [cycle, setCycle] = useState([]);
   const [selectedRankIndex, setSelectedRankIndex] = useState(1); // Default index: 1 -> (m1, m2)
+  const [isExploring, setIsExploring] = useState(false);
+  const [warningMessage, setWarningMessage] = useState('');
 
+  const maxIterations = 1000;
+  let iterationCount = 0;
+  
   const graphRef = useRef();
 
   const handleRankChange = (direction) => {
@@ -56,7 +61,6 @@ function App() {
       return updatedRows;
     });
   };
-
 
   const handleImport = (importedRows) => {
     // Exclude the "Coefficient" column from dynamically created columns
@@ -182,8 +186,72 @@ function App() {
     link.click();
   };
 
-  const [warningMessage, setWarningMessage] = useState('');
+  const exploreRanks = () => {
+    if (isExploring) {
+      setIsExploring(false);
+      return;
+    }
+    setIsExploring(true); // Disable controls
+    let rankIndex = selectedRankIndex;
+    
+    const incrementRankAndCheck = () => {
+      // Increment rank index
+      rankIndex += 1;
+  
+      // Update state and compute new pairwise scores
+      const rankPair = rankIndex % 2 === 1
+        ? [rankIndex, rankIndex + 1]
+        : [rankIndex + 1, rankIndex];
+      const newPairwiseScores = calculatePairwiseMedians(rows, columns, rankPair);
+  
+      // Detect cycles and check scores
+      const detectedCycles = detectCondorcetCycles(newPairwiseScores, columns);
+      const hasZeroScore = Object.values(newPairwiseScores).some(candidateScores =>
+        Object.values(candidateScores).some(score => score === 0)
+      );
+  
+      // Update state for pairwiseScores, cycles, and rank index
+      setPairwiseScores(newPairwiseScores);
+      setCycle(detectedCycles);
+      setSelectedRankIndex(rankIndex);
+  
+      // Update warning message
+      if (detectedCycles.length > 0 || hasZeroScore) {
+        if (detectedCycles.length > 0) {
+          setWarningMessage(
+            `Condorcet cycles detected: ${detectedCycles
+              .map(cycle => cycle.join(' > '))
+              .join(' | ')}`
+          );
+        } else {
+          setWarningMessage(
+            'A cycle has been detected in candidate evaluation with a pairwise score of zero.'
+          );
+        }
+      } else {
+        setWarningMessage('');
+        setIsExploring(false);
+      }
+  
+      // Stop when no cycles and no zero scores
+      if (detectedCycles.length === 0 && !hasZeroScore) {
+        clearInterval(intervalId); // Stop the interval
+      }
+    };
+  
+    // Use an interval to increment ranks at a set interval until the condition is met
+    const intervalId = setInterval(() => {
 
+      iterationCount += 1;
+      incrementRankAndCheck();
+
+      if (iterationCount >= maxIterations) {
+        clearInterval(intervalId);
+        setIsExploring(false);
+        setWarningMessage('Maximum iterations reached. Exploration stopped.');
+      }
+    }, 100); // Adjust delay (500ms) as needed
+  };
 
   useEffect(() => {
     const rankPair = selectedRankIndex % 2 === 1
@@ -250,8 +318,21 @@ function App() {
 
       <div className="rank-selection">
         <button onClick={() => handleRankChange('decrement')}>&lt;</button>
-        <span>Rank ({`m${selectedRankIndex},m${selectedRankIndex + 1}`})</span>
+        <span>Rank
+          <input
+            type="number"
+            value={selectedRankIndex}
+            disabled={isExploring}
+            onChange={(e) => {
+              const newIndex = parseInt(e.target.value, 10);
+              if (!isNaN(newIndex)) {
+                setSelectedRankIndex(newIndex);
+              }
+            }}
+          /> :
+          ({`m${selectedRankIndex},m${selectedRankIndex + 1}`})</span>
         <button onClick={() => handleRankChange('increment')}>&gt;</button>
+        <button onClick={() => exploreRanks()}> Explore {isExploring && <div className="spinner"></div>} </button> 
       </div>
 
       {warningMessage && (
@@ -268,7 +349,7 @@ function App() {
               pairwiseScores={pairwiseScores}
             />
             <div className="export-buttons">
-              <button onClick={exportSVGAsImage} className="btn btn-primary">Export Graph as PNG</button>
+              <button onClick={exportSVGAsImage} className="btn btn-primary">Export Graph as SVG</button>
               <button onClick={exportResultsTableAsCSV} className="btn btn-secondary">Export Results as CSV</button>
             </div>
           </div>
