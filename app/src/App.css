@@ -259,3 +259,28 @@ button {
   text-align: center;
   font-weight: bold;
 }
+
+
+/* Rank selection input field */
+.rank-selection input[type="number"] {
+  min-width: 30px;
+  max-width: 60px;
+  width: auto;
+  text-align: center;
+  margin-left: 10px;
+}
+
+.spinner {
+  border: 4px solid rgba(0, 0, 0, 0.1);
+  border-left-color: #000;
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
