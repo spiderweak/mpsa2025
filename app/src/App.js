@@ -20,6 +20,8 @@ function App() {
   const [isExploring, setIsExploring] = useState(false);
   const [warningMessage, setWarningMessage] = useState('');
 
+  const [isWarningExpanded, setIsWarningExpanded] = useState(false);
+
   const maxIterations = 1000;
   let iterationCount = 0;
   
@@ -235,22 +237,23 @@ function App() {
   
       // Stop when no cycles and no zero scores
       if (detectedCycles.length === 0 && !hasZeroScore) {
-        clearInterval(intervalId); // Stop the interval
+        setIsExploring(false);
+        return;
       }
-    };
-  
-    // Use an interval to increment ranks at a set interval until the condition is met
-    const intervalId = setInterval(() => {
+
 
       iterationCount += 1;
-      incrementRankAndCheck();
 
       if (iterationCount >= maxIterations) {
-        clearInterval(intervalId);
         setIsExploring(false);
         setWarningMessage('Maximum iterations reached. Exploration stopped.');
+        return;
       }
-    }, 100); // Adjust delay (500ms) as needed
+
+      setTimeout(incrementRankAndCheck, 50);
+    };
+  
+    incrementRankAndCheck();
   };
 
   useEffect(() => {
@@ -337,9 +340,22 @@ function App() {
 
       {warningMessage && (
         <div className="warning-message">
-          <p>{warningMessage}</p>
+          <p style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            {isWarningExpanded
+              ? warningMessage
+              : warningMessage.split('|')[0] + '...'} {/* Show summary or full warning */}
+            <button
+              className="toggle-warning-button"
+              onClick={() => setIsWarningExpanded(!isWarningExpanded)}
+              aria-label={isWarningExpanded ? "Collapse warning" : "Expand warning"}
+            >
+              {isWarningExpanded ? '▲' : '▼'} {/* Toggle caret */}
+            </button>
+          </p>
         </div>
       )}
+
+
 
         {/* Flex container for ResultsTable and CondorcetGraph */}
         <div className="results-graph-container">
