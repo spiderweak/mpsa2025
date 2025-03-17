@@ -3,6 +3,7 @@ import Papa from 'papaparse';
 import InputTable from './components/InputTable';
 import ResultsTable from './components/ResultsTable';
 import CondorcetGraph from './components/CondorcetGraph';
+import Footer from './components/Footer';
 import { calculatePairwiseMedians } from './algorithms/pairwiseComparison';
 import { detectCondorcetCycles } from './algorithms/condorcetCycle';
 import './App.css';
@@ -123,7 +124,7 @@ function App() {
 
   const handleColumnNameChange = (newName, index) => {
     const columnId = columns[index].id;
-  
+
     setColumns(prevColumns => {
       const updatedColumns = [...prevColumns];
       updatedColumns[index] = { ...updatedColumns[index], name: newName }; // Update name, keep ID
@@ -137,23 +138,6 @@ function App() {
       }))
     );
   };
-  
-  /*
-  const handleColumnNameChange = (newName, index) => {
-    const oldName = columns[index];
-    const updatedColumns = [...columns];
-    updatedColumns[index] = newName;
-    setColumns(updatedColumns);
-
-    setRows(prevRows =>
-      prevRows.map(row => {
-        const updatedRow = { ...row, [newName]: row[oldName] };
-        delete updatedRow[oldName];
-        return updatedRow;
-      })
-    );
-  };
-  */
 
   const handleDeleteRow = (rowIndex) => {
     setRows(prevRows => prevRows.filter((_, index) => index !== rowIndex));
@@ -195,11 +179,11 @@ function App() {
     }
     setIsExploring(true); // Disable controls
     let rankIndex = selectedRankIndex;
-    
+
     const incrementRankAndCheck = () => {
       // Increment rank index
       rankIndex += 1;
-  
+
       // Update state and compute new pairwise scores
       const rankPair = rankIndex % 2 === 1
         ? [rankIndex, rankIndex + 1]
@@ -260,13 +244,9 @@ function App() {
     const rankPair = selectedRankIndex % 2 === 1
     ? [selectedRankIndex, selectedRankIndex + 1] // Odd: [n, n+1]
     : [selectedRankIndex + 1, selectedRankIndex]; // Even: [n+1, n]
-    //console.log("Ranks:", rankPair);
-
 
     const newPairwiseScores = calculatePairwiseMedians(rows, columns, rankPair);
     setPairwiseScores(newPairwiseScores);
-    //console.log("Pairwise Scores:", newPairwiseScores);
-
 
     const detectedCycles = detectCondorcetCycles(newPairwiseScores, columns);
     setCycle(detectedCycles);
@@ -277,28 +257,24 @@ function App() {
 
     if (detectedCycles.length > 0 || hasZeroScore) {
       if (detectedCycles.length > 0) {
-        //console.log("Detected Cycles:", detectedCycles);
         setWarningMessage(
           `Condorcet cycles detected: ${detectedCycles
             .map(cycle => cycle.join(' > '))
             .join(' | ')}`
         );
       } else {
-        //console.log("Detected Cycles:", detectedCycles);
         setWarningMessage('A cycle has been detected in candidate evaluation with a pairwise score of zero.');
       }
     } else {
-      //console.log("Detected Cycles:", detectedCycles);
       setWarningMessage('');
     }
-
 
   }, [rows, columns, selectedRankIndex]);
 
   return (
     <div className="App">
       <header className="App-header">
-        <h1> Why break condorcet cycle when we can make them disappear ? </h1>
+        <h1> How to Make Condorcet Cycles Vanish and Obtain Grades without Combinatorial Exposure ? </h1>
       </header>
 
       <div className="App-content">
@@ -355,8 +331,6 @@ function App() {
         </div>
       )}
 
-
-
         {/* Flex container for ResultsTable and CondorcetGraph */}
         <div className="results-graph-container">
           <div>
@@ -371,9 +345,9 @@ function App() {
           </div>
           <CondorcetGraph ref={graphRef} pairwiseScores={pairwiseScores} columns={columns} />
         </div>
-
-        {/* Export Buttons */}
       </div>
+
+      <Footer />
     </div>
   );
 }
