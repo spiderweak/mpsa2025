@@ -19,11 +19,14 @@ function App() {
   const [cycle, setCycle] = useState([]);
   const [selectedRankIndex, setSelectedRankIndex] = useState(1); // Default index: 1 -> (m1, m2)
   const [isExploring, setIsExploring] = useState(false);
+  const [shouldStopExploration, setShouldStopExploration] = useState(false);
+  const stopExplorationRef = useRef(false);
+  
   const [warningMessage, setWarningMessage] = useState('');
-
   const [isWarningExpanded, setIsWarningExpanded] = useState(false);
 
-  const maxIterations = 1000;
+  const [maxIterations, setMaxIterations] = useState(1000);
+
   let iterationCount = 0;
   
   const graphRef = useRef();
@@ -174,13 +177,23 @@ function App() {
 
   const exploreRanks = () => {
     if (isExploring) {
-      setIsExploring(false);
+      stopExplorationRef.current = true;
+      setShouldStopExploration(true);
       return;
     }
+
     setIsExploring(true); // Disable controls
+    setShouldStopExploration(false);
+    stopExplorationRef.current = false;
     let rankIndex = selectedRankIndex;
 
     const incrementRankAndCheck = () => {
+      if (stopExplorationRef.current) {
+        setIsExploring(false);
+        setShouldStopExploration(false);
+        return;
+      }
+
       // Increment rank index
       rankIndex += 1;
 
@@ -216,25 +229,30 @@ function App() {
         }
       } else {
         setWarningMessage('');
-        setIsExploring(false);
       }
   
       // Stop when no cycles and no zero scores
       if (detectedCycles.length === 0 && !hasZeroScore) {
         setIsExploring(false);
+        setShouldStopExploration(false);
         return;
       }
-
 
       iterationCount += 1;
 
-      if (iterationCount >= maxIterations) {
-        setIsExploring(false);
+      if (rankIndex >= maxIterations) {
         setWarningMessage('Maximum iterations reached. Exploration stopped.');
+        setIsExploring(false);
+        setShouldStopExploration(false);
         return;
       }
 
-      setTimeout(incrementRankAndCheck, 50);
+      if (!stopExplorationRef.current && iterationCount < maxIterations) {
+        setTimeout(incrementRankAndCheck, 50);
+      } else {
+        setIsExploring(false);
+        setShouldStopExploration(false);
+      }
     };
   
     incrementRankAndCheck();
@@ -250,6 +268,9 @@ function App() {
 
     const detectedCycles = detectCondorcetCycles(newPairwiseScores, columns);
     setCycle(detectedCycles);
+
+    const newMaxIterations = rows.reduce((sum, row) => sum + (row.Coefficient || 1), 0);
+    setMaxIterations(newMaxIterations);
 
     const hasZeroScore = Object.values(newPairwiseScores).some(candidateScores =>
       Object.values(candidateScores).some(score => score === 0)
@@ -311,7 +332,11 @@ function App() {
           /> :
           ({`m${selectedRankIndex},m${selectedRankIndex + 1}`})</span>
         <button onClick={() => handleRankChange('increment')}>&gt;</button>
-        <button onClick={() => exploreRanks()}> Explore {isExploring && <div className="spinner"></div>} </button> 
+        <button
+          onClick={exploreRanks}
+        >
+          {isExploring && !shouldStopExploration ? 'Stop' : 'Explore'}
+        </button>
       </div>
 
       {warningMessage && (
