@@ -12,13 +12,15 @@ const Footer = () => {
       year: "2023",
       journal: "80th Annual Midwest Political Science Association Conference 2023",
       url: "https://www.researchgate.net/publication/370167659_WHY_BREAK_CONDORCET_CYCLES_WHEN_WE_CAN_MAKE_THEM_DISAPPEAR",
+      presentation: "/presentations/condorcet_cycles_2023.pdf"
     },
     {
       id: 2,
       title: "How to Make Condorcet Cycles Vanish and Obtain Grades without Combinatorial Exposure?",
       authors: "Rouillon, Stephane Francis and Bernard, Antoine",
       year: "2025",
-      journal: "82th Annual Midwest Political Science Association Conference 2025"
+      journal: "82th Annual Midwest Political Science Association Conference 2025",
+      presentation: "/presentations/condorcet_cycles_2025.pdf"
     }
   ];
 
@@ -41,9 +43,16 @@ const Footer = () => {
                   <span className="reference-authors">{ref.authors}</span> ({ref.year}). 
                   <span className="reference-title">"{ref.title}"</span>, 
                   <em className="reference-journal">{ref.journal}</em>. 
-                  <a href={ref.url} target="_blank" rel="noopener noreferrer">
-                    [Link]
-                  </a>
+                  {ref.url && (
+                    <a href={ref.url} target="_blank" rel="noopener noreferrer">
+                      [Link]
+                    </a>
+                  )}
+                  {ref.presentation && (
+                    <a href={ref.presentation} target="_blank" rel="noopener noreferrer">
+                      [Presentation Slides]
+                    </a>
+                  )}
                 </li>
               ))}
             </ul>

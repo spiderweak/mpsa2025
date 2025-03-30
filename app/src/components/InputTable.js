@@ -68,7 +68,7 @@ function InputTable({ rows, columns, onChange, onImport, onColumnsChange, onColu
         <table className="table table-bordered mt-2">
           <thead>
             <tr>
-              <th>Candidate</th>
+              <th></th>
               <th>Coefficient</th>
               {columns.map((column, index) => (
                 <th key={index}>
