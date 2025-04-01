@@ -321,6 +321,7 @@ function App() {
         <span>Rank
           <input
             type="number"
+            min="1"
             value={selectedRankIndex}
             disabled={isExploring}
             onChange={(e) => {
