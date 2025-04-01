@@ -21,7 +21,16 @@ const Footer = () => {
       year: "2025",
       journal: "82th Annual Midwest Political Science Association Conference 2025",
       presentation: "/presentations/condorcet_cycles_2025.pdf"
-    }
+    },
+    {
+      id: 3,
+      title: "A Guarantee of Stability for Any Parliament Composition: The Constructive Weighted Crutch Option",
+      authors: "Rouillon, Stephane Francis",
+      year: "2025",
+      journal: "82th Annual Midwest Political Science Association Conference 2025",
+      url: "/localarticle/ConstructiveWeightedCrutchOption_SR7_202504.pdf",
+      presentation: "/presentations/MPSA2025_ConstrWeigCrutch_SR.pdf"
+    },
   ];
 
   return (
