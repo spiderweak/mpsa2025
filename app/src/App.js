@@ -37,9 +37,9 @@ function App() {
     );
   };
 
-  const exportSVGAsImage = () => {
+  const exportGraphAs = (format) => {
     if (graphRef.current) {
-      graphRef.current.exportAsImage();
+      graphRef.current.exportImage(format);
     }
   };
 
@@ -365,7 +365,8 @@ function App() {
               pairwiseScores={pairwiseScores}
             />
             <div className="export-buttons">
-              <button onClick={exportSVGAsImage} className="btn btn-primary">Export Graph as SVG</button>
+              <button onClick={() => exportGraphAs('svg')} className="btn btn-primary">Export Graph as SVG</button>
+              <button onClick={() => exportGraphAs('png')} className="btn btn-primary">Export Graph as PNG</button>
               <button onClick={exportResultsTableAsCSV} className="btn btn-secondary">Export Results as CSV</button>
             </div>
           </div>

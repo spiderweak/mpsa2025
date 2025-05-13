@@ -3,9 +3,8 @@ import * as d3 from 'd3';
 
 const CondorcetGraph = forwardRef(({ pairwiseScores, columns }, ref) => {
   const svgRef = useRef();
-
   useImperativeHandle(ref, () => ({
-    exportAsImage() {
+    exportImage(format = 'svg') {
       if (svgRef.current) {
         const svgElement = svgRef.current;
 
@@ -26,18 +25,43 @@ const CondorcetGraph = forwardRef(({ pairwiseScores, columns }, ref) => {
         const svgBlob = new Blob([svgData], { type: 'image/svg+xml;charset=utf-8' });
         const url = URL.createObjectURL(svgBlob);
 
-        // Create download link
-        const downloadLink = document.createElement('a');
-        downloadLink.href = url;
-        downloadLink.download = 'graph.svg';
-        document.body.appendChild(downloadLink);
-        downloadLink.click();
-        document.body.removeChild(downloadLink);
+        if (format === 'svg') {
+          const downloadLink = document.createElement('a');
+          downloadLink.href = url;
+          downloadLink.download = 'graph.svg';
+          document.body.appendChild(downloadLink);
+          downloadLink.click();
+          document.body.removeChild(downloadLink);
+          URL.revokeObjectURL(url);
+        } else if (format === 'png') {
+          const img = new Image();
+          img.onload = function() {
+            const canvas = document.createElement('canvas');
+            canvas.width = width;
+            canvas.height = height;
+            const ctx = canvas.getContext('2d');
 
-        // Restore original dimensions
-        URL.revokeObjectURL(url);
+            // Fill with white background
+            ctx.fillStyle = 'white';
+            ctx.fillRect(0, 0, width, height);
+
+            // Draw SVG on canvas
+            ctx.drawImage(img, 0, 0, width, height);
+            URL.revokeObjectURL(url);
+
+            // Export canvas as PNG
+            const pngUrl = canvas.toDataURL('image/png');
+            const downloadLink = document.createElement('a');
+            downloadLink.href = pngUrl;
+            downloadLink.download = 'graph.png';
+            document.body.appendChild(downloadLink);
+            downloadLink.click();
+            document.body.removeChild(downloadLink);
+          };
+          img.src = url;
+        }
       }
-    },
+    }
   }));
 
   useEffect(() => {
